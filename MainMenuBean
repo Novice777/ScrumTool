@@ -1,0 +1,87 @@
+package beans;
+
+import java.util.ArrayList;
+import javax.faces.model.SelectItem;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import pojos.Document;
+
+/**
+ *
+ * @author Philip Poelz
+ */
+public class MainMenuBean {
+    private String selectedItem;
+    private ArrayList<SelectItem> itemList = new ArrayList<SelectItem>();
+    
+    private TreeNode root;
+    private Document selectedDocument;
+    //private ScrumProject sp; Klasse für Project erstellen
+    private boolean showTable = false;
+    
+    public MainMenuBean() {
+        root = new DefaultTreeNode("Scrum Project", null);
+        
+        TreeNode pb = new DefaultTreeNode(new Document("Product Backlog","Folder",0),root);
+        TreeNode sb = new DefaultTreeNode(new Document("Sprint Backlogs","Folder",0),root);
+        TreeNode bc = new DefaultTreeNode(new Document("Burndown Charts","Folder",0),root);
+        
+        TreeNode productBacklog = new DefaultTreeNode("document", new Document("PB File", "Product Backlog", 30.371), pb);  
+        TreeNode sprinbBacklog1 = new DefaultTreeNode("document", new Document("SB1", "Sprint Backlog", 5.22), sb);  
+        TreeNode burndownChart1 = new DefaultTreeNode("document", new Document("BC1","Burndown Chart", 26.321), bc);  
+        
+        //itemList.add(new SelectItem("gotoCreateScrum","Create Scrum Project")); Nur Funktion aus Bean aufrufen, keine Navigation
+        
+        /*itemList.add(new SelectItem("gotoLoadScrum","Load Scrum Project"));   !!!!!!!!!!!!!!!!!!!!!!!!!! FILEUPLOAD!!!!
+        itemList.add(new SelectItem("gotoSaveScrum","Save Scrum Project"));     Als Popups Anzeigen lassen
+        itemList.add(new SelectItem("gotoDeleteScrum","Delete Scrum Project")); !!!!!!!!!!!!!!!!!!!!!!!!!!
+        itemList.add(new SelectItem("gotoSettings","Settings"));*/
+    }
+
+    public ArrayList<SelectItem> getItemList() {
+        return itemList;
+    }
+
+    public void setItemList(ArrayList<SelectItem> itemList) {
+        this.itemList = itemList;
+    }
+
+    public String getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(String selectedItem) {
+        this.selectedItem = selectedItem;
+    }
+
+    public TreeNode getRoot() {
+        return root;
+    }
+
+    public void setRoot(TreeNode root) {
+        this.root = root;
+    }
+
+    public Document getSelectedDocument() {
+        return selectedDocument;
+    }
+
+    public void setSelectedDocument(Document selectedDocument) {
+        this.selectedDocument = selectedDocument;
+    }
+
+    public boolean isShowTable() {
+        return showTable;
+    }
+
+    public void setShowTable(boolean showTable) {
+        this.showTable = showTable;
+    }        
+    
+    public String createProject(){
+        showTable = true;        
+        
+        return null;
+    }
+    
+}
