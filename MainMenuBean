@@ -22,13 +22,13 @@ public class MainMenuBean {
     public MainMenuBean() {
         root = new DefaultTreeNode("Scrum Project", null);
         
-        TreeNode pb = new DefaultTreeNode(new Document("Product Backlog","Folder",0),root);
-        TreeNode sb = new DefaultTreeNode(new Document("Sprint Backlogs","Folder",0),root);
-        TreeNode bc = new DefaultTreeNode(new Document("Burndown Charts","Folder",0),root);
+        TreeNode pb = new DefaultTreeNode(new Document("Product Backlog","Folder"),root);
+        TreeNode sb = new DefaultTreeNode(new Document("Sprint Backlogs","Folder"),root);
+        TreeNode bc = new DefaultTreeNode(new Document("Burndown Charts","Folder"),root);
         
-        TreeNode productBacklog = new DefaultTreeNode("document", new Document("PB File", "Product Backlog", 30.371), pb);  
-        TreeNode sprinbBacklog1 = new DefaultTreeNode("document", new Document("SB1", "Sprint Backlog", 5.22), sb);  
-        TreeNode burndownChart1 = new DefaultTreeNode("document", new Document("BC1","Burndown Chart", 26.321), bc);  
+        TreeNode productBacklog = new DefaultTreeNode("document", new Document("PB File", "Product Backlog"), pb);  
+        TreeNode sprinbBacklog1 = new DefaultTreeNode("document", new Document("SB1", "Sprint Backlog"), sb);  
+        TreeNode burndownChart1 = new DefaultTreeNode("document", new Document("BC1","Burndown Chart"), bc);  
         
         //itemList.add(new SelectItem("gotoCreateScrum","Create Scrum Project")); Nur Funktion aus Bean aufrufen, keine Navigation
         
