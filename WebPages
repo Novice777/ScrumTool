@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        
+        <!--Das Hauptmenu-->
+        <h:form id="MenuForm">
+            <p:toolbar>
+                <p:toolbarGroup align="left">
+                    <p:menuButton id="MenuButton" value="Menu">
+                        <p:menuitem value="Create Scrum Project" action="#{mainMenuBean.createProject()}" immediate="true" 
+                                    update="MenuForm"/>
+                        <p:menuitem value="Load Scrum Project"/>
+                        <p:menuitem value="Save Scrum Project"/>
+                        <p:menuitem value="Delete Scrum Project"/>
+                    </p:menuButton>
+
+                    <p:commandButton id="SaveButton" icon="ui-icon-disk"/>
+                    <p:commandButton id="ProductBacklogButton" value="Product Backlog"/>
+                    <p:commandButton id="SprintBacklogButton" value="Sprint Backlogs"/>
+                    <p:commandButton id="BurndownButton" value="Burndown Charts"/>
+                </p:toolbarGroup>
+                
+                <p:toolbarGroup align="right">
+                    <p:menuButton id="SettingsButton" value="Settings">
+                        <p:menuitem value="A"/>
+                        <p:menuitem value="B"/>
+                        <p:menuitem value="C"/>
+                    </p:menuButton>
+                </p:toolbarGroup>
+            </p:toolbar>    
+        
+        <!--Alle Dokumente des Projekts stehen hier!-->        
+            <p:treeTable value="#{mainMenuBean.root}" var="document" rendered="#{mainMenuBean.showTable}">
+                <p:column style="width:32%">  
+                    <f:facet name="header">  
+                        Name
+                    </f:facet>  
+                    <h:outputText value="#{document.name}" />  
+                </p:column>  
+  
+                <p:column style="width:32%">  
+                    <f:facet name="header">  
+                        Type
+                    </f:facet>  
+                    <h:outputText value="#{document.type}" />  
+                </p:column>  
+
+                <p:column style="width:32%">
+                    <f:facet name="header">  
+                        Size
+                    </f:facet>  
+                    <h:outputText value="#{document.size}" />  
+                </p:column>
+            </p:treeTable>
+            
+            <p:dialog id="dialog" header="Document Detail" showEffect="fade" modal="true">  
+                <p:outputPanel id="documentPanel">  
+                    <h:panelGrid  columns="2" cellpadding="5">  
+                        <h:outputLabel for="name" value="Name: " />  
+                        <h:outputText id="name" value="#{mainMenuBean.selectedDocument.name}" style="font-weight:bold" />  
+
+                        <h:outputLabel for="size" value="Size: " />  
+                        <h:outputText id="size" value="#{mainMenuBean.selectedDocument.type}" style="font-weight:bold" />  
+
+                        <h:outputLabel for="type" value="Type " />  
+                        <h:outputText id="type" value="#{mainMenuBean.selectedDocument.size}" style="font-weight:bold" />  
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>              
+        </h:form>
+        
+    </h:body>
+</html>
+
