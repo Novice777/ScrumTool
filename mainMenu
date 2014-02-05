@@ -52,12 +52,7 @@
                     <h:outputText value="#{document.type}" />  
                 </p:column>  
 
-                <p:column style="width:32%">
-                    <f:facet name="header">  
-                        Size
-                    </f:facet>  
-                    <h:outputText value="#{document.size}" />  
-                </p:column>
+                
             </p:treeTable>
             
             <p:dialog id="dialog" header="Document Detail" showEffect="fade" modal="true">  
@@ -69,8 +64,7 @@
                         <h:outputLabel for="size" value="Size: " />  
                         <h:outputText id="size" value="#{mainMenuBean.selectedDocument.type}" style="font-weight:bold" />  
 
-                        <h:outputLabel for="type" value="Type " />  
-                        <h:outputText id="type" value="#{mainMenuBean.selectedDocument.size}" style="font-weight:bold" />  
+                          
                     </h:panelGrid>
                 </p:outputPanel>
             </p:dialog>              
