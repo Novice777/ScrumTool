@@ -1,0 +1,24 @@
+package pojos;
+
+import org.primefaces.model.TreeNode;
+
+/**
+ *
+ * @author Philip Poelz
+ */
+public class ScrumProject {
+    Document productBacklog;
+    Document[] sprintBacklogs;
+    Document[] burndownCharts;
+    
+    //Funktionen für Create, Load, Save, Delete Project#########################
+    
+    /*Create erstellt Projekt mit Ordnern, Dateien werden später hinzugefügt*/
+    
+    /*Load -> Dateibrowser, einzelne Dateien wie z.B.: Product Backlog sind nur
+     innerhalb des Product Backlog Fensters/Tabs zu laden*/
+    
+    /*Save -> Dateibrowser, ein Projektordner wird erstellt*/
+    
+    /*Delete gibt Übersicht welche Dateien gelöscht werden sollen -> Checkboxes*/
+}
