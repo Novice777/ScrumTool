@@ -37,37 +37,55 @@
             </p:toolbar>    
         
         <!--Alle Dokumente des Projekts stehen hier!-->        
-            <p:treeTable value="#{mainMenuBean.root}" var="document" rendered="#{mainMenuBean.showTable}">
-                <p:column style="width:32%">  
-                    <f:facet name="header">  
+            <p:treeTable id="DocumentTable" value="#{mainMenuBean.root}" var="document" rendered="#{mainMenuBean.showTable}"                         
+                         selection="#{mainMenuBean.selectedDocument}" selectionMode="single">
+                
+                <p:ajax event="select" update="#{mainMenuBean.setPBdialog(true)}"/>
+                <!--
+                <p:ajax event="select" process="@this" update=":MenuForm:ProductBacklogDialog"/>                
+                <p:ajax event="unselect" update="# {mainMenuBean.setShowTable(false)}"/>
+                -->
+                <p:column style="width:32%">
+                    <f:facet name="header">
                         Name
                     </f:facet>  
-                    <h:outputText value="#{document.name}" />  
-                </p:column>  
-  
-                <p:column style="width:32%">  
-                    <f:facet name="header">  
-                        Type
-                    </f:facet>  
-                    <h:outputText value="#{document.type}" />  
-                </p:column>  
-
+                    <h:outputText value="#{document.name}"/>
+                </p:column>
                 
+                <p:column style="width:32%">
+                    <f:facet name="header">
+                        Type
+                    </f:facet>
+                    <h:outputText value="#{document.type}"/>
+                </p:column>
             </p:treeTable>
-            
-            <p:dialog id="dialog" header="Document Detail" showEffect="fade" modal="true">  
-                <p:outputPanel id="documentPanel">  
-                    <h:panelGrid  columns="2" cellpadding="5">  
-                        <h:outputLabel for="name" value="Name: " />  
-                        <h:outputText id="name" value="#{mainMenuBean.selectedDocument.name}" style="font-weight:bold" />  
+                        
+        <!--Dialoge zum Erstellen und Löschen-->
+        <p:dialog id="ProductBacklogDialog" closable="true" modal="true" rendered="#{mainMenuBean.PBdialog}" visible="true">
+                <p:commandButton id="addPB" value="new Product Backlog"/>
+                <p:commandButton id="delPB" value="delete Product Backlog"/>
+            </p:dialog>
 
-                        <h:outputLabel for="size" value="Size: " />  
-                        <h:outputText id="size" value="#{mainMenuBean.selectedDocument.type}" style="font-weight:bold" />  
+            <p:dialog id="SprintBacklogDialog" closable="true" modal="true" visible="false">
+                <p:commandButton id="addToSBs" value="add new Sprint Backlog"/>
+                <p:commandButton id="delFromSBs" value="delete selected SprintBacklog"/>
+            </p:dialog>
 
-                          
+            <p:dialog id="BurndownChartDialog" closable="true" modal="true" visible="false">
+                <p:commandButton id="addToBCs" value="add new Burndown Chart"/>
+                <p:commandButton id="delFromBCs" value="delete selected Burndown Chart"/>                          
+            </p:dialog>
+        
+        <!--Weg finden den Dialog mit Click auf [Folder] sichtbar zu machen -> für CreatePB/SB/BC Funktionen
+            <p:dialog id="dialog" header="Document Detail" showEffect="fade" modal="true" parent="DocumentTable" 
+                      visible="# {mainMenuBean.dialog}">
+                <p:outputPanel id="documentPanel">
+                    <h:panelGrid  columns="2" cellpadding="5">
+
                     </h:panelGrid>
                 </p:outputPanel>
-            </p:dialog>              
+            </p:dialog>
+        -->
         </h:form>
         
     </h:body>
