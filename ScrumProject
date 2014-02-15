@@ -1,5 +1,8 @@
 package pojos;
 
+import java.util.ArrayList;
+import javax.faces.FacesException;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
 /**
@@ -7,13 +10,31 @@ import org.primefaces.model.TreeNode;
  * @author Philip Poelz
  */
 public class ScrumProject {
-    Document productBacklog;
-    Document[] sprintBacklogs;
-    Document[] burndownCharts;
+    //Users are allowed to add files to the 3 main categories
+    private TreeNode productB;
+    private TreeNode sprintBs;
+    private TreeNode burndownC;
     
-    //Funktionen für Create, Load, Save, Delete Project#########################
+    //Physical Projectpath
+    private String projectPath;
     
-    /*Create erstellt Projekt mit Ordnern, Dateien werden später hinzugefügt*/
+    //Files that will be added
+    public static ArrayList<TreeNode> files;
+    
+    //Funktionen für Create, Load, Save, Delete Project
+    
+    /* Konstruktor erstellt Ordner und fügt Projektpfad hinzu
+     * Dateien werden später hinzugefügt*/
+    public ScrumProject(TreeNode root, String path){        
+        productB = new DefaultTreeNode("Folder", new Document("Product Backlog","Folder"), root);
+        sprintBs = new DefaultTreeNode("Folder", new Document("Sprint Backlogs","Folder"), root);
+        burndownC = new DefaultTreeNode("Folder", new Document("Burndown Charts","Folder"), root);
+
+        files = new ArrayList<TreeNode>();
+        projectPath = path;
+    }
+    
+    /*Create -> Dateibrowser, Pfad auswählen in dem Projektordner mit 3 Ordnern angelegt wird*/
     
     /*Load -> Dateibrowser, einzelne Dateien wie z.B.: Product Backlog sind nur
      innerhalb des Product Backlog Fensters/Tabs zu laden*/
@@ -21,4 +42,71 @@ public class ScrumProject {
     /*Save -> Dateibrowser, ein Projektordner wird erstellt*/
     
     /*Delete gibt Übersicht welche Dateien gelöscht werden sollen -> Checkboxes*/
+    
+    //Product Backlog Befehle für Dialog
+    public String addProductBacklog(){
+        boolean create = true;
+        
+        for(TreeNode tn:files){
+            Document temp = (Document) tn.getData();
+            if(temp.getFileNum()==100){
+                create = false;
+                throw new FacesException("There is already a Product Backlog!");
+            }
+        }
+        
+        if(create == true){
+            TreeNode pb = new DefaultTreeNode("Document", new Document("PB", "Product Backlog"), productB);
+            files.add(pb);
+        }
+        
+        return null;
+    }
+    
+    public String deleteProductBacklog(){
+        for(TreeNode tn:files){
+            Document temp = (Document) tn.getData();
+            if(temp.getFileNum()==100){
+                files.remove(tn);
+            }else{
+                throw new FacesException("Could not find any Product Backlog!");
+            }
+        }
+        
+        return null;
+    }
+    
+    //Sprint Backlog Befehle für Dialog
+    public String addSprintBacklog(){        
+        TreeNode sb = new DefaultTreeNode("Document", new Document("SB", "Sprint Backlog"), sprintBs);
+        files.add(sb);
+        
+        return null;
+    }
+    
+    public String deleteSprintBacklog(TreeNode selectedDocument){
+        Document temp = (Document) selectedDocument.getData();
+        if(temp!=null && temp.getFileNum()<50){
+            files.remove(selectedDocument);
+        }
+        
+        return null;
+    }
+    
+    //Burndown Chart Befehle für Dialog
+    public String addBurndownChart(){        
+        TreeNode bdC = new DefaultTreeNode("Document", new Document("BDC", "Burndown Chart"), burndownC);
+        files.add(bdC);
+        
+        return null;
+    }
+    
+    public String deleteBurndownChart(TreeNode selectedDocument){
+        Document temp = (Document) selectedDocument.getData();
+        if(temp!=null && temp.getFileNum()>49 && temp.getFileNum() <100){
+            files.remove(selectedDocument);
+        }
+        
+        return null;
+    }
 }
