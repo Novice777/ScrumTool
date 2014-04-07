@@ -1,0 +1,8 @@
+package pojos;
+
+/**
+ * @author Philip Poelz
+ * 
+ * This Enum contains the modes available for working with the Burndown Chart
+ */
+public enum BdCModes{add, edit, delete, changeOrder}
