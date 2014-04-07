@@ -2,6 +2,7 @@ package pojos;
 
 import java.util.ArrayList;
 import javax.faces.FacesException;
+import javax.faces.context.FacesContext;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 
@@ -15,9 +16,6 @@ public class ScrumProject {
     private TreeNode sprintBs;
     private TreeNode burndownC;
     
-    //Physical Projectpath
-    private String projectPath;
-    
     //Files that will be added
     public static ArrayList<TreeNode> files;
     
@@ -25,13 +23,11 @@ public class ScrumProject {
     
     /* Konstruktor erstellt Ordner und fügt Projektpfad hinzu
      * Dateien werden später hinzugefügt*/
-    public ScrumProject(TreeNode root, String path){        
-        productB = new DefaultTreeNode("Folder", new Document("Product Backlog","Folder"), root);
-        sprintBs = new DefaultTreeNode("Folder", new Document("Sprint Backlogs","Folder"), root);
-        burndownC = new DefaultTreeNode("Folder", new Document("Burndown Charts","Folder"), root);
-
-        files = new ArrayList<TreeNode>();
-        projectPath = path;
+    public ScrumProject(TreeNode root){
+        files = new ArrayList<>();
+        productB = new DefaultTreeNode(new Document("Product Backlog","PBFolder"), root);
+        sprintBs = new DefaultTreeNode(new Document("Sprint Backlogs","SBFolder"), root);
+        burndownC = new DefaultTreeNode(new Document("Burndown Charts","BDCFolder"), root);
     }
     
     /*Create -> Dateibrowser, Pfad auswählen in dem Projektordner mit 3 Ordnern angelegt wird*/
@@ -63,16 +59,18 @@ public class ScrumProject {
         return null;
     }
     
-    public String deleteProductBacklog(){
+    public String deleteProductBacklog(TreeNode root){
         for(TreeNode tn:files){
             Document temp = (Document) tn.getData();
-            if(temp.getFileNum()==100){
+            if(temp.getFileNum()==100){   
+                productB.getChildren().remove(tn);
                 files.remove(tn);
             }else{
                 throw new FacesException("Could not find any Product Backlog!");
             }
         }
-        
+        FacesContext.getCurrentInstance().renderResponse();
+   
         return null;
     }
     
@@ -84,13 +82,14 @@ public class ScrumProject {
         return null;
     }
     
-    public String deleteSprintBacklog(TreeNode selectedDocument){
+    public void deleteSprintBacklog(TreeNode root, TreeNode selectedDocument){
         Document temp = (Document) selectedDocument.getData();
         if(temp!=null && temp.getFileNum()<50){
             files.remove(selectedDocument);
+            sprintBs.getChildren().remove(selectedDocument);
         }
+        FacesContext.getCurrentInstance().renderResponse();
         
-        return null;
     }
     
     //Burndown Chart Befehle für Dialog
@@ -101,12 +100,35 @@ public class ScrumProject {
         return null;
     }
     
-    public String deleteBurndownChart(TreeNode selectedDocument){
+    //root is needed to update the tree after delete
+    public void deleteBurndownChart(TreeNode root, TreeNode selectedDocument){
         Document temp = (Document) selectedDocument.getData();
         if(temp!=null && temp.getFileNum()>49 && temp.getFileNum() <100){
             files.remove(selectedDocument);
+            burndownC.getChildren().remove(selectedDocument);            
         }
-        
-        return null;
+        FacesContext.getCurrentInstance().renderResponse();
+                
+    }
+    
+    /*
+     * Used if LoadProject-Button is clicked or after a Delete
+     * 
+     * It's essential to have the tree root, if element is deleted root has to
+     * be updated
+     */
+    public void loadFiles(TreeNode root, boolean afterDelete){
+        if(afterDelete==true){
+            
+            root=new DefaultTreeNode("Scrum Project", null);
+            
+            //One TreeNode was deleted so the root has to be updated
+            for(TreeNode t:files){
+                t.setParent(root);
+            }
+        }
+        else{
+            //used for database loading
+        }
     }
 }
