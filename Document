@@ -7,13 +7,15 @@ import org.primefaces.model.TreeNode;
  * @author Philip Poelz
  */
 public class Document {
-    private String name;    
-    private String type;    
+    private String name;
+    private String type;
     /*
      * Sprint Backlog -> Numbers from 0 -> 49
      * Burndown Chart -> Numbers from 50 -> 99
      * Product Backlog -> Number 100
-     * Folder -> Number 101
+     * PBFolder -> Number 101
+     * SBFolder -> Number 102
+     * BDCFolder -> Number 103
      */
     private int fileNum;
 
@@ -23,7 +25,7 @@ public class Document {
         //Typ bei Erstellung mit Checkboxes, keine Eigene Namensgebung!
         
         int highestSprintB=0;
-        int highestBurndownC=50;
+        int highestBurndownC=50;                
         
         for(TreeNode tn:ScrumProject.files){
             Document temp = (Document) tn.getData();
@@ -36,22 +38,28 @@ public class Document {
             }
         }
         
-//        switch(type){
-//            case "Folder":
-//                fileNum=101;
-//                break;
-//            case "Product Backlog":
-//                fileNum=100;
-//                break;
-//            case "Burndown Chart":
-//                this.name+=highestBurndownC+1+"";
-//                fileNum=highestBurndownC+1;
-//                break;
-//            case "Sprint Backlog":
-//                this.name=highestSprintB+1+"";
-//                fileNum=highestSprintB+1;
-//                break;
-//        }
+        switch(type){
+            case "PBFolder":
+                fileNum=101;
+                break;
+            case "SBFolder":
+                fileNum=102;
+                break;
+            case "BDCFolder":
+                fileNum=103;
+                break;
+            case "Product Backlog":
+                fileNum=100;
+                break;
+            case "Burndown Chart":
+                this.name+=highestBurndownC+1-50+"";
+                fileNum=highestBurndownC+1;
+                break;
+            case "Sprint Backlog":
+                this.name+=highestSprintB+1+"";
+                fileNum=highestSprintB+1;
+                break;
+        }
     }
 
     public String getName() {
