@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    
+    <h:head>
+        <title>burndownChart</title>
+    </h:head>
+    
+    <h:body>
+        <h:form>
+            <p:toolbar id="BurndownChart_Toolbar">
+                <p:toolbarGroup align="left">
+                    <p:commandButton id="add" value="add" onclick="popupDialog.showModalDialog" 
+                            action="#{burnDownChartBean.setMode(component.id)}">
+                        <p:ajax update="popupDialog"/>
+                    </p:commandButton>
+                    
+            <!--Für ADD-->
+            <p:dialog id="popupDialog" modal="true" visible="#{burnDownChartBean.popupPanelADD}">                
+                <p:selectBooleanCheckbox id="bothSeries" value="#{burnDownChartBean.bothSeries}">
+                    <p:ajax update="popupDialog"/>                    
+                    <!---->
+                </p:selectBooleanCheckbox>
+                <br/>
+                
+                <p:outputLabel value="Enter a new key"/>
+                <br/>
+                <p:inputText id="key" value="#{burnDownChartBean.newKey}" />
+                <br/>
+                
+                <p:outputLabel value="Enter a value"/>
+                <p:outputLabel id="fbs" value="for both series" rendered="false"/>                
+                <br/>
+                <p:inputText id="s1value" value="#{burnDownChartBean.actualValue}" placeholder="actual series"
+                             rendered="#{burnDownChartBean.bothSeries}"/>
+                <p:inputText id="s2value" value="#{burnDownChartBean.desiredValue}" placeholder="desired series"
+                             rendered="#{burnDownChartBean.bothSeries}"/>
+                                
+                <p:inputText id="value" value="#{burnDownChartBean.newValue}"
+                             rendered="#{!burnDownChartBean.bothSeries}"/>
+                <br/>
+                <br/>
+                
+                <p:commandButton value="create new Milestone" action="#{burnDownChartBean.addValues}">
+                    <p:ajax update="@form" process="s1value s2value key"/>
+                </p:commandButton>
+                <br/>
+                <p:outputLabel value="After clicking me, click on a chartSeries to add the new milestone" 
+                               style="color: indigo" rendered="#{!burnDownChartBean.bothSeries}"/>
+                <p:outputLabel value="After clicking me, the values will be added to the chart" 
+                               style="color: darkgreen" rendered="#{burnDownChartBean.bothSeries}"/>
+            </p:dialog>
+                    
+                    <p:commandButton id="edit" value="edit"
+                           action="#{burnDownChartBean.setMode(component.id)}"/>
+                    
+                    <p:commandButton id="delete" value="delete" 
+                           action="#{burnDownChartBean.setMode(component.id)}"/>
+                    
+                    <p:commandButton id="changeOrder" value="change Order" 
+                           action="#{burnDownChartBean.setMode(component.id)}"/>
+                </p:toolbarGroup>
+                
+                <p:toolbarGroup align="right">
+                    <p:commandButton id="changeLineOptic" value="change line optic"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+            
+            <p:panel id="burndownChartPanel" style="border:none;">
+                <p:lineChart value="#{burnDownChartBean.burnDownChartModel}" legendPosition="e">
+                    <p:ajax event="itemSelect" listener="#{burnDownChartBean.chartListener}" update="@this"/>
+                </p:lineChart>                            
+            </p:panel>
+            
+        </h:form>
+    </h:body>
+</html>
