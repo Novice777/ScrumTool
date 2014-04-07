@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>mainMenu</title>
+    </h:head>
+    <h:body>
+
+        <!--Das Hauptmenu-->
+        <h:form id="MenuForm">
+            <p:toolbar>
+                <p:toolbarGroup align="left">
+                    <p:menuButton id="MenuButton" value="Menu">
+                        <p:menuitem value="Create Scrum Project" action="#{mainMenuBean.createProject()}" immediate="true" 
+                                    update="MenuForm"/>
+                        <p:menuitem value="Load Scrum Project"/>
+                        <p:menuitem value="Save Scrum Project"/>
+                        <p:menuitem value="Delete Scrum Project"/>
+                    </p:menuButton>
+
+                    <p:commandButton id="SaveButton" icon="ui-icon-disk"/>
+                    <p:commandButton id="ProductBacklogButton" value="Product Backlog"/>
+                    <p:commandButton id="SprintBacklogButton" value="Sprint Backlogs"/>
+                    <p:commandButton id="BurndownButton" value="Burndown Charts" action="burndown" ajax="false"/>
+                </p:toolbarGroup>                                
+
+                <p:toolbarGroup align="right">
+                    <p:menuButton id="SettingsButton" value="Settings">
+                        <p:menuitem value="A"/>
+                        <p:menuitem value="B"/>
+                        <p:menuitem value="C"/>
+                    </p:menuButton>
+                </p:toolbarGroup>
+            </p:toolbar>    
+
+            <!--Alle Dokumente des Projekts stehen hier!-->        
+            <p:treeTable  id="DocumentTable" value="#{mainMenuBean.root}" var="document" rendered="#{mainMenuBean.showTable}"                         
+                         selection="#{mainMenuBean.selectedDocument}" selectionMode="single">
+
+                <p:ajax event="select" update="@form" listener="#{mainMenuBean.onNodeSelect}"/>                
+                
+                <p:column style="width:32%">
+                    <f:facet name="header">
+                        Name
+                    </f:facet>  
+                    <h:outputText value="#{document.name}"/>
+                </p:column>
+
+                <p:column style="width:32%">
+                    <f:facet name="header">
+                        Type
+                    </f:facet>
+                    <h:outputText value="#{document.type}"/>
+                </p:column>
+                
+                <p:column style="width:32%">
+                    <f:facet name="header">
+                        FileNum
+                    </f:facet>
+                    <h:outputText value="#{document.fileNum}"/>
+                </p:column>
+            </p:treeTable>
+
+            <!--Dialoge zum Erstellen und Löschen-->
+            <div id="Dialogs">
+                <p:dialog id="ProductBacklogDialog" header="Product Backlog Dialog" closable="true" modal="true" 
+                          rendered="#{mainMenuBean.PBdialog}" visible="true">
+                    <p:commandButton id="addPB" value="new Product Backlog" 
+                                     action="#{mainMenuBean.sp.addProductBacklog()}" update="@form">
+                    </p:commandButton>
+                    
+                    <p:commandButton id="delPB" value="delete Product Backlog" 
+                                     action="#{mainMenuBean.sp.deleteProductBacklog(mainMenuBean.root)}" update="@form">
+                    </p:commandButton>
+                    
+                </p:dialog>
+
+                <p:dialog id="SprintBacklogDialog" header="Sprint Backlog Dialog" closable="true" modal="true"
+                          rendered="#{mainMenuBean.SBdialog}" visible="true">
+                    <p:commandButton id="addToSBs" value="add new Sprint Backlog" 
+                                     action="#{mainMenuBean.sp.addSprintBacklog()}" update="@form">
+                    </p:commandButton>
+                    
+                    <p:commandButton id="delFromSBs" value="delete selected SprintBacklog" 
+                                     action="#{mainMenuBean.sp.deleteSprintBacklog(
+                                               mainMenuBean.root ,mainMenuBean.selectedDocument)}" update="@form">
+                    </p:commandButton>
+                </p:dialog>
+
+                <p:dialog id="BurndownChartDialog" header="Burndown Chart Dialog" closable="true" modal="true" 
+                          rendered="#{mainMenuBean.BDCdialog}" visible="true">
+                    <p:commandButton id="addToBCs" value="add new Burndown Chart" 
+                                     action="#{mainMenuBean.sp.addBurndownChart()}" update="@form">
+                    </p:commandButton>
+                    
+                    <p:commandButton id="delFromBCs" value="delete selected Burndown Chart"
+                                     action="#{mainMenuBean.sp.deleteBurndownChart(
+                                               mainMenuBean.root ,mainMenuBean.selectedDocument)}" update="@form">
+                    </p:commandButton>
+                </p:dialog>                
+            </div>
+        </h:form>
+
+    </h:body>
+</html>
+
