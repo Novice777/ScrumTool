@@ -1,9 +1,9 @@
 package beans;
 
-import java.util.ArrayList;
-import javax.faces.model.SelectItem;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import pojos.Document;
 import pojos.ScrumProject;
 
 /**
@@ -11,9 +11,6 @@ import pojos.ScrumProject;
  * @author Philip Poelz
  */
 public class MainMenuBean {
-    private String selectedItem;
-    private ArrayList<SelectItem> itemList = new ArrayList<SelectItem>();
-    
     //Not available for use, no other main Categories
     private TreeNode root;
     private TreeNode selectedDocument;
@@ -28,30 +25,9 @@ public class MainMenuBean {
     public MainMenuBean() {
         root = new DefaultTreeNode("Scrum Project", null);
         sp = null;
-        //itemList.add(new SelectItem("gotoCreateScrum","Create Scrum Project")); Nur Funktion aus Bean aufrufen, keine Navigation
-        
-        /*itemList.add(new SelectItem("gotoLoadScrum","Load Scrum Project"));   !!!!!!!!!!!!!!!!!!!!!!!!!! FILEUPLOAD!!!!
-        itemList.add(new SelectItem("gotoSaveScrum","Save Scrum Project"));     Als Popups Anzeigen lassen
-        itemList.add(new SelectItem("gotoDeleteScrum","Delete Scrum Project")); !!!!!!!!!!!!!!!!!!!!!!!!!!
-        itemList.add(new SelectItem("gotoSettings","Settings"));*/
     }
 
-    public ArrayList<SelectItem> getItemList() {
-        return itemList;
-    }
-
-    public void setItemList(ArrayList<SelectItem> itemList) {
-        this.itemList = itemList;
-    }
-
-    public String getSelectedItem() {
-        return selectedItem;
-    }
-
-    public void setSelectedItem(String selectedItem) {
-        this.selectedItem = selectedItem;
-    }
-
+    //Getters and Setters
     public TreeNode getRoot() {
         return root;
     }
@@ -61,18 +37,6 @@ public class MainMenuBean {
     }
 
     public TreeNode getSelectedDocument() {
-//        if(selectedDocument.getData()!=null){
-//            Document temp = (Document) selectedDocument.getData();
-//            
-//            if(temp.getFileNum()<50){
-//                sbDialog=true;
-//            }else if(temp.getFileNum()<100){
-//                bdcDialog=true;
-//            }else if(temp.getFileNum()<101){
-//                pbDialog=true;
-//            }
-//        }
-                
         return selectedDocument;
     }
 
@@ -112,15 +76,48 @@ public class MainMenuBean {
         this.bdcDialog = bdCdialog;
     }
 
+    public ScrumProject getSp() {
+        return sp;
+    }
+
+    public void setSp(ScrumProject sp) {
+        this.sp = sp;
+    }    
+
+    /*
+     *************************** OTHER FUNCTIONS *******************************
+     */
     public String createProject(){
         showTable = true;
         
         if(sp==null){
            //The Button "CreateProject" will send the chosen Path as parameter
-           sp = new ScrumProject(root,"A");
+           sp = new ScrumProject(root);
         }
         
         return null;
     }
+    
+    public void onNodeSelect(NodeSelectEvent event) {  
+        if(event.getTreeNode().getData()!=null){
+            Document temp = (Document) event.getTreeNode().getData();
 
+            if(temp.getFileNum()==100 || temp.getFileNum()==101){
+                pbDialog=true;
+                sbDialog=false;
+                bdcDialog=false;
+            }
+            if(temp.getFileNum()<50 || temp.getFileNum()==102){
+                pbDialog=false;
+                sbDialog=true;
+                bdcDialog=false;
+            }
+            if((temp.getFileNum()<100 && temp.getFileNum()>49) 
+                    || temp.getFileNum()==103){
+                pbDialog=false;
+                sbDialog=false;
+                bdcDialog=true;
+            }
+        }
+    }
 }
