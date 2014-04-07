@@ -1,0 +1,272 @@
+package beans;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import org.primefaces.event.ItemSelectEvent;
+import org.primefaces.model.chart.CartesianChartModel;
+import org.primefaces.model.chart.ChartSeries;
+import pojos.BdCModes;
+
+/**
+ *
+ * @author Philip Poelz
+ */
+public class BurnDownChartBean{
+//Structure of the Burndown Chart
+    private CartesianChartModel burnDownChartModel;
+    private ChartSeries desiredStateSeries;
+    private ChartSeries actualStateSeries;
+    
+//Enum for Burndown Chart functions
+    private BdCModes modes;
+    
+//Add function
+    String newKey;
+    //added after clicking on a series
+    String newValue;    
+    
+    //added after submitting the dialog
+    String actualValue;
+    String desiredValue;
+    
+//Messages
+    FacesMessage error;
+    
+    boolean popupPanelADD=false;
+    boolean bothSeries=false;
+    public BurnDownChartBean() {    
+        burnDownChartModel = new CartesianChartModel();
+        desiredStateSeries = new ChartSeries("Desired State");
+        actualStateSeries = new ChartSeries("Actual State");
+        
+        desiredStateSeries.set("ProjectStart", 0);
+        actualStateSeries.set("ProjectStart", 0);
+        
+        desiredStateSeries.set("Next Hop", 10);
+        actualStateSeries.set("Next Hop", 15);        
+        
+        desiredStateSeries.set("a", 20);
+        actualStateSeries.set("a", 25);
+        
+        desiredStateSeries.set("b", 30);       
+        actualStateSeries.set("b", 35);
+        
+        desiredStateSeries.set("c", 40);
+        actualStateSeries.set("c", 45);
+        
+        desiredStateSeries.set("d", 50);
+        actualStateSeries.set("d", 55);
+        
+        burnDownChartModel.addSeries(desiredStateSeries);
+        burnDownChartModel.addSeries(actualStateSeries);
+        
+        error=null;
+    }
+
+    public BurnDownChartBean(CartesianChartModel burnDownChartModel, ChartSeries desiredStateSeries, ChartSeries actualStateSeries) {
+        this.burnDownChartModel = burnDownChartModel;
+        this.desiredStateSeries = desiredStateSeries;
+        this.actualStateSeries = actualStateSeries;
+    }
+
+/*-------------------------Getter and Setter----------------------------------*/
+    public CartesianChartModel getBurnDownChartModel() {
+        return burnDownChartModel;
+    }
+
+    public void setBurnDownChartModel(CartesianChartModel burnDownChartModel) {
+        this.burnDownChartModel = burnDownChartModel;
+    }
+
+    public String getNewKey() {
+        return newKey;
+    }
+
+    public void setNewKey(String newKey) {
+        this.newKey = newKey;
+    }
+
+    public String getNewValue() {
+        return newValue;
+    }
+
+    public void setNewValue(String newValue) {
+        this.newValue = newValue;
+    }
+
+    public boolean isPopupPanelADD() {
+        return popupPanelADD;
+    }
+
+    public void setPopupPanelADD(boolean popupPanel) {
+        this.popupPanelADD = popupPanel;
+    }
+
+    public boolean isBothSeries() {
+        return bothSeries;
+    }
+
+    public void setBothSeries(boolean bothSeries) {
+        this.bothSeries = bothSeries;
+    }        
+
+    public String getActualValue() {
+        return actualValue;
+    }
+
+    public void setActualValue(String series1Value) {
+        this.actualValue = series1Value;
+    }
+    
+    public String getDesiredValue() {
+        return desiredValue;
+    }
+
+    public void setDesiredValue(String series2Value) {
+        this.desiredValue = series2Value;
+    }
+    
+/*----------------------------Other functions---------------------------------*/
+    
+    //functioning
+    public void setMode(String componentID){
+        
+        switch(componentID){
+            case "add":
+                modes=BdCModes.add;
+                popupPanelADD=true;
+                break;
+                
+            case "edit":
+                modes=BdCModes.edit;
+                break;
+            
+            case "delete":
+                modes=BdCModes.delete;
+                break;
+            
+            case "changeOrder":
+                modes=BdCModes.changeOrder;
+                break;
+        }       
+    }
+    
+    /*
+     * Diese Funktion dient zum löschen, bearbeiten und einfügen von Punkten in
+     * den Chart
+     */
+    public void chartListener(ItemSelectEvent event){
+        System.out.println("-------------------------------------------------");
+        
+        int itemindex = event.getItemIndex();
+        System.out.println("Index of Points in the Series, beginning with 0: "+itemindex);
+        
+        int seriesindex = event.getSeriesIndex();
+        System.out.println("ChartSeries, Index for Line: "+seriesindex);                
+        
+        System.out.println("-------------------------------------------------");
+        
+        /*
+         * Alle Funktionen sollen zunächst hier getestet werden
+         * Es darf nur ein modus aktiviert sein!
+            * Modes mit enum
+         * 
+         */
+        
+//        switch(modes){
+//            case add:
+//                addMileStone(seriesindex);
+//                break;
+//            
+//            case edit:
+//                
+//                break;
+//                
+//            case delete:
+//                deleteMilestone(seriesindex, itemindex);
+//                break;
+//                
+//            case changeOrder:
+//                
+//                break;
+//        }
+    }
+    
+    private void deleteMilestone(int seriesindex, int itemindex){
+        Set<Object> keys = null;                //Milestones
+        Iterator keyIterator = null;            
+        ArrayList<Number> values = null;        //Values to the milestones
+        Map<Object, Number> seriesData = null;  //Containing Keys and Values
+        Map<Object,Number> m = new LinkedHashMap<>();        
+        
+        burnDownChartModel.clear();             /*Clear the chart from the old
+         * values to render only the new (rerender does not work!)*/
+        if(seriesindex == 0){ //desiredStateSeries
+            seriesData = desiredStateSeries.getData();
+            keys = seriesData.keySet();
+            keyIterator = keys.iterator();
+            
+            values = new ArrayList<>(seriesData.values()); 
+            values.set(itemindex, 0);
+            
+            int i = 0;
+            while(keyIterator.hasNext()){                            
+                Object key = keyIterator.next();
+                m.put(key, values.get(i));                
+                i++;
+            }
+            
+            desiredStateSeries.setData(m);
+        }
+        
+        if(seriesindex == 1){ //actualStateSeries
+            seriesData = actualStateSeries.getData();
+            keys = seriesData.keySet();
+            keyIterator = keys.iterator();
+            
+            values = new ArrayList<>(seriesData.values()); 
+            values.set(itemindex, 0);
+            
+            int i = 0;
+            while(keyIterator.hasNext()){                            
+                Object key = keyIterator.next();
+                m.put(key, values.get(i));                
+                i++;
+            }
+            
+            actualStateSeries.setData(m);
+        }                        
+        burnDownChartModel.addSeries(desiredStateSeries);
+        burnDownChartModel.addSeries(actualStateSeries);
+    }
+    
+    public void addValues(){
+        if(bothSeries==true){
+            if(actualValue!=null&&desiredValue!=null&&newKey!=null){
+                //abprüfen ob key noch nicht besteht
+                burnDownChartModel.clear();
+                try{                                   
+                actualStateSeries.set(newKey, Integer.parseInt(actualValue));
+                //ThreadPoolExecutor runWorker function?!
+                //throws dispatchUncaughtException from Thread.java here!
+                
+                desiredStateSeries.set(newKey, Integer.parseInt(desiredValue));
+                
+                }catch(NumberFormatException ex){
+                    ex.printStackTrace();
+                    error=new FacesMessage("A value you entered was not a number");
+                    FacesContext.getCurrentInstance().addMessage("Error Message:", error);
+                }
+                burnDownChartModel.addSeries(desiredStateSeries);
+                burnDownChartModel.addSeries(actualStateSeries);
+                
+                FacesContext.getCurrentInstance().renderResponse();
+            }
+        }
+    }
+}
