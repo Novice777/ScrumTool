@@ -11,4 +11,19 @@
         <managed-bean-class>beans.MainMenuBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>burnDownChartBean</managed-bean-name>
+        <managed-bean-class>beans.BurnDownChartBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+
+    <navigation-rule>
+        <from-view-id>mainMenu.xhtml</from-view-id>
+        
+        <navigation-case>
+            <from-outcome>burndown</from-outcome>
+            <to-view-id>burnDownChart.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
 </faces-config>
