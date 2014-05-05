@@ -13,17 +13,20 @@
         <h:form>
             <p:toolbar id="BurndownChart_Toolbar">
                 <p:toolbarGroup align="left">
-                    <p:commandButton id="add" value="add" onclick="popupDialog.showModalDialog" 
+            
+            <!--Add Function-->
+                    <p:commandButton id="add" value="add" onclick="popupDialogAdd.showModalDialog" 
                             action="#{burnDownChartBean.setMode(component.id)}">
-                        <p:ajax update="popupDialog"/>
+                        <p:ajax update="popupDialogAdd"/>
                     </p:commandButton>
-                    
-            <!--Für ADD-->
-            <p:dialog id="popupDialog" modal="true" visible="#{burnDownChartBean.popupPanelADD}">                
-                <p:selectBooleanCheckbox id="bothSeries" value="#{burnDownChartBean.bothSeries}">
-                    <p:ajax update="popupDialog"/>                    
-                    <!---->
-                </p:selectBooleanCheckbox>
+                               
+            <p:dialog id="popupDialogAdd" modal="true" visible="#{burnDownChartBean.popupPanelADD}">
+                <p:outputLabel value="Enter in both series"/>
+                <br/>
+                <!--<p:selectBooleanCheckbox id="bothSeries" value="# {burnDownChartBean.bothSeries}">
+                    <p:ajax update="popupDialogAdd"/>
+                </p:selectBooleanCheckbox>-->
+                <br/>
                 <br/>
                 
                 <p:outputLabel value="Enter a new key"/>
@@ -32,43 +35,73 @@
                 <br/>
                 
                 <p:outputLabel value="Enter a value"/>
-                <p:outputLabel id="fbs" value="for both series" rendered="false"/>                
+                <p:outputLabel id="fbs" value="for both series" rendered="false"/>
                 <br/>
-                <p:inputText id="s1value" value="#{burnDownChartBean.actualValue}" placeholder="actual series"
-                             rendered="#{burnDownChartBean.bothSeries}"/>
-                <p:inputText id="s2value" value="#{burnDownChartBean.desiredValue}" placeholder="desired series"
-                             rendered="#{burnDownChartBean.bothSeries}"/>
+                <p:inputText id="s1value" value="#{burnDownChartBean.actualValue}" 
+                             placeholder="actual series"/>
+                <p:inputText id="s2value" value="#{burnDownChartBean.desiredValue}" 
+                             placeholder="desired series"/>
                                 
-                <p:inputText id="value" value="#{burnDownChartBean.newValue}"
-                             rendered="#{!burnDownChartBean.bothSeries}"/>
-                <br/>
+                <!--<p:inputText id="value" value="# {burnDownChartBean.newValue}"
+                             rendered="# {!burnDownChartBean.bothSeries}"/>-->                
                 <br/>
                 
-                <p:commandButton value="create new Milestone" action="#{burnDownChartBean.addValues}">
+                <p:commandButton value="create new Milestones" action="#{burnDownChartBean.addValues}" 
+                                 onclick="this.close()">
                     <p:ajax update="@form" process="s1value s2value key"/>
                 </p:commandButton>
+                
+                <!--<p:commandButton value="create new Milestone" 
+                                 onclick="this.close()" rendered="# {!burnDownChartBean.bothSeries}">
+                    <p:ajax update="@form" process="key value"/>
+                </p:commandButton>-->
                 <br/>
-                <p:outputLabel value="After clicking me, click on a chartSeries to add the new milestone" 
-                               style="color: indigo" rendered="#{!burnDownChartBean.bothSeries}"/>
+                <!--<p:outputLabel value="After clicking me, click on a chartSeries to add the new milestone" 
+                               style="color: indigo" rendered="# {!burnDownChartBean.bothSeries}"/>-->
                 <p:outputLabel value="After clicking me, the values will be added to the chart" 
-                               style="color: darkgreen" rendered="#{burnDownChartBean.bothSeries}"/>
-            </p:dialog>
-                    
+                               style="color: darkgreen"/>
+            </p:dialog>                                
+           
+            <!--Edit Function-->
                     <p:commandButton id="edit" value="edit"
-                           action="#{burnDownChartBean.setMode(component.id)}"/>
-                    
+                                     action="#{burnDownChartBean.setMode(component.id)}">                        
+                    </p:commandButton>                                
+                 
+            <!--Delete Function-->
                     <p:commandButton id="delete" value="delete" 
                            action="#{burnDownChartBean.setMode(component.id)}"/>
+                            
+            <p:dialog id="popupDialogChangeOrder" modal="true" visible="#{burnDownChartBean.popupDialogChangeOrder}">
+                <!--
+                    !!!BONUSFUNKTION!!!
                     
-                    <p:commandButton id="changeOrder" value="change Order" 
-                           action="#{burnDownChartBean.setMode(component.id)}"/>
+                    tabelle mit zwei reihen für serien
+                    keys sind fix    
+                    jedes feld muss wert beeinhalten, nur werte tauschen
+                    am ende tabellenmodel neu erstellen
+                
+                         key1    key2    key3    key4
+                        _____________________________
+                actual  |  10      50     100     110
+                desired |  20      30      80     130
+                
+                    ermöglicht mehrere vertauschungen
+                -->
+            </p:dialog>
                 </p:toolbarGroup>
                 
+                <!--right aligned buttions-->
                 <p:toolbarGroup align="right">
+                    <!--Change order Function-->
+                    <p:commandButton id="changeOrder" value="change Order" 
+                           action="#{burnDownChartBean.setMode(component.id)}"/>
+
+                    
                     <p:commandButton id="changeLineOptic" value="change line optic"/>
                 </p:toolbarGroup>
             </p:toolbar>
             
+            <!--The actual Burndown Chart-->
             <p:panel id="burndownChartPanel" style="border:none;">
                 <p:lineChart value="#{burnDownChartBean.burnDownChartModel}" legendPosition="e">
                     <p:ajax event="itemSelect" listener="#{burnDownChartBean.chartListener}" update="@this"/>
@@ -76,5 +109,20 @@
             </p:panel>
             
         </h:form>
+        
+        <p:dialog id="popupDialogEdit" modal="true" widgetVar="popupEdit">
+            <h:form>
+                <p:outputLabel value="old value: #{burnDownChartBean.oldValue}"/>
+                <br/>
+                
+                <p:outputLabel value="new value: "/>
+                <p:inputText value="#{burnDownChartBean.alteredValue}"/>
+                <br/>
+                
+                <p:commandButton value="Edit" action="#{burnDownChartBean.editMilestone}">
+                    <f:ajax render="@all"/>
+                </p:commandButton>               
+            </h:form>
+        </p:dialog>
     </h:body>
 </html>
