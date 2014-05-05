@@ -1,0 +1,59 @@
+package pojos;
+
+/**
+ *
+ * @author Philip Poelz
+ */
+public class BurnDownElement {
+    private int value;
+
+    private String key;
+    
+    //number of the key
+    private int itemindex;
+    
+    private int seriesindex;
+
+    public BurnDownElement() {
+    }
+
+    public BurnDownElement(int value, int itemindex, int seriesindex, String key) {
+        this.value = value;
+        this.itemindex = itemindex;
+        this.seriesindex = seriesindex;
+        this.key = key;
+    }
+
+    public int getItemindex() {
+        return itemindex;
+    }
+
+    public void setItemindex(int itemindex) {
+        this.itemindex = itemindex;
+    }
+ 
+    public int getSeriesindex() {
+        return seriesindex;
+    }
+
+    public void setSeriesindex(int seriesindex) {
+        this.seriesindex = seriesindex;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }        
+    
+}
