@@ -7,10 +7,12 @@ import java.util.Map;
 import java.util.Set;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.chart.CartesianChartModel;
 import org.primefaces.model.chart.ChartSeries;
 import pojos.BdCModes;
+import pojos.BurnDownElement;
 
 /**
  *
@@ -26,19 +28,33 @@ public class BurnDownChartBean{
     private BdCModes modes;
     
 //Add function
-    String newKey;
+    private String newKey;
     //added after clicking on a series
-    String newValue;    
+    private String newValue;
     
     //added after submitting the dialog
-    String actualValue;
-    String desiredValue;
+    private String actualValue;
+    private String desiredValue;
+    
+//Edit function
+    private BurnDownElement beforeEdit;
+    private BurnDownElement afterEdit;
+    private int oldValue;
+    private int alteredValue;
     
 //Messages
-    FacesMessage error;
+    private FacesMessage error;
     
-    boolean popupPanelADD=false;
-    boolean bothSeries=false;
+    private boolean popupPanelADD=false;
+    private boolean popupDialogEdit=false;
+    private boolean popupDialogChangeOrder=false;
+    
+//    private boolean bothSeries=false;
+    
+//Needed for chartListener
+    private int seriesindex;
+    private int itemindex;
+    
     public BurnDownChartBean() {    
         burnDownChartModel = new CartesianChartModel();
         desiredStateSeries = new ChartSeries("Desired State");
@@ -66,6 +82,8 @@ public class BurnDownChartBean{
         burnDownChartModel.addSeries(actualStateSeries);
         
         error=null;
+        beforeEdit=null;
+        afterEdit=null;
     }
 
     public BurnDownChartBean(CartesianChartModel burnDownChartModel, ChartSeries desiredStateSeries, ChartSeries actualStateSeries) {
@@ -107,13 +125,13 @@ public class BurnDownChartBean{
         this.popupPanelADD = popupPanel;
     }
 
-    public boolean isBothSeries() {
-        return bothSeries;
-    }
-
-    public void setBothSeries(boolean bothSeries) {
-        this.bothSeries = bothSeries;
-    }        
+//    public boolean isBothSeries() {
+//        return bothSeries;
+//    }
+//
+//    public void setBothSeries(boolean bothSeries) {
+//        this.bothSeries = bothSeries;
+//    }        
 
     public String getActualValue() {
         return actualValue;
@@ -130,11 +148,62 @@ public class BurnDownChartBean{
     public void setDesiredValue(String series2Value) {
         this.desiredValue = series2Value;
     }
+
+    public BurnDownElement getBeforeEdit() {
+        return beforeEdit;
+    }
+
+    public void setBeforeEdit(BurnDownElement beforeEdit) {
+        this.beforeEdit = beforeEdit;
+    }
+
+    public BurnDownElement getAfterEdit() {
+        return afterEdit;
+    }
+
+    public void setAfterEdit(BurnDownElement afterEdit) {
+        this.afterEdit = afterEdit;
+    }
+
+    public boolean isPopupDialogChangeOrder() {
+        return popupDialogChangeOrder;
+    }
+
+    public void setPopupDialogChangeOrder(boolean popupDialogChangeOrder) {
+        this.popupDialogChangeOrder = popupDialogChangeOrder;
+    }
+
+    public boolean isPopupDialogEdit() {
+        return popupDialogEdit;
+    }
+
+    public void setPopupDialogEdit(boolean popupDialogEdit) {
+        this.popupDialogEdit = popupDialogEdit;
+    }    
+
+    public int getOldValue() {
+        return oldValue;
+    }
+
+    public void setOldValue(int oldValue) {
+        this.oldValue = oldValue;
+    }
+
+    public int getAlteredValue() {
+        return alteredValue;
+    }
+
+    public void setAlteredValue(int alteredValue) {
+        this.alteredValue = alteredValue;
+    }
     
 /*----------------------------Other functions---------------------------------*/
     
-    //functioning
+    //setzt den modus mit dem im chart gearbeitet wird
     public void setMode(String componentID){
+        popupPanelADD=false;
+        popupDialogEdit=false;
+        popupDialogChangeOrder=false;        
         
         switch(componentID){
             case "add":
@@ -147,54 +216,45 @@ public class BurnDownChartBean{
                 break;
             
             case "delete":
-                modes=BdCModes.delete;
+                modes=BdCModes.delete;                
                 break;
             
             case "changeOrder":
                 modes=BdCModes.changeOrder;
+                popupDialogChangeOrder=true;
                 break;
         }       
     }
     
-    /*
+    /**
      * Diese Funktion dient zum löschen, bearbeiten und einfügen von Punkten in
      * den Chart
-     */
+     **/
     public void chartListener(ItemSelectEvent event){
         System.out.println("-------------------------------------------------");
         
-        int itemindex = event.getItemIndex();
+        itemindex = event.getItemIndex();
         System.out.println("Index of Points in the Series, beginning with 0: "+itemindex);
         
-        int seriesindex = event.getSeriesIndex();
+        seriesindex = event.getSeriesIndex();
         System.out.println("ChartSeries, Index for Line: "+seriesindex);                
         
-        System.out.println("-------------------------------------------------");
+        System.out.println("-------------------------------------------------");                        
         
-        /*
-         * Alle Funktionen sollen zunächst hier getestet werden
-         * Es darf nur ein modus aktiviert sein!
-            * Modes mit enum
-         * 
-         */
-        
-//        switch(modes){
-//            case add:
-//                addMileStone(seriesindex);
-//                break;
-//            
-//            case edit:
-//                
-//                break;
-//                
-//            case delete:
-//                deleteMilestone(seriesindex, itemindex);
-//                break;
-//                
-//            case changeOrder:
-//                
-//                break;
+//BOTHSERIES OPTION LÖSCHEN!
+//        if(bothSeries==false){
+//            addValues();
 //        }
+        
+        switch(modes){            
+            case edit:
+                editMilestoneListener(seriesindex, itemindex);
+                break;
+                
+            case delete:
+                deleteMilestone(seriesindex, itemindex);
+                break;                            
+        }
     }
     
     private void deleteMilestone(int seriesindex, int itemindex){
@@ -217,7 +277,7 @@ public class BurnDownChartBean{
             int i = 0;
             while(keyIterator.hasNext()){                            
                 Object key = keyIterator.next();
-                m.put(key, values.get(i));                
+                m.put(key, values.get(i));
                 i++;
             }
             
@@ -246,27 +306,142 @@ public class BurnDownChartBean{
     }
     
     public void addValues(){
-        if(bothSeries==true){
-            if(actualValue!=null&&desiredValue!=null&&newKey!=null){
-                //abprüfen ob key noch nicht besteht
-                burnDownChartModel.clear();
-                try{                                   
-                actualStateSeries.set(newKey, Integer.parseInt(actualValue));
-                //ThreadPoolExecutor runWorker function?!
-                //throws dispatchUncaughtException from Thread.java here!
-                
-                desiredStateSeries.set(newKey, Integer.parseInt(desiredValue));
-                
-                }catch(NumberFormatException ex){
-                    ex.printStackTrace();
-                    error=new FacesMessage("A value you entered was not a number");
-                    FacesContext.getCurrentInstance().addMessage("Error Message:", error);
-                }
-                burnDownChartModel.addSeries(desiredStateSeries);
-                burnDownChartModel.addSeries(actualStateSeries);
-                
-                FacesContext.getCurrentInstance().renderResponse();
+        Set<Object> keys = null;                //Milestones
+        Map<Object, Number> seriesData = null;  //Containing Keys and Values
+        Iterator keyIterator = null;
+
+        seriesData = actualStateSeries.getData();
+        keys = seriesData.keySet();
+        keyIterator = keys.iterator();
+        
+
+        boolean keyAlreadyThere = false;
+        
+        //if the key already consists it would override the old one!
+        while(keyIterator.hasNext()){
+            String key = (String) keyIterator.next();
+            if(key.equals(newKey)){
+                keyAlreadyThere = true;
             }
+        }        
+        
+        if(keyAlreadyThere == false){            
+            //checkbox angecklickt, serienwerte in dialog eingegeben
+//            if(bothSeries==true){
+//                System.out.println("in beide serien eintragen!");
+                if(actualValue!=null&&desiredValue!=null&&newKey!=null){
+                    //abprüfen ob key noch nicht besteht
+
+                    try{
+                    actualStateSeries.set(newKey, Integer.parseInt(actualValue));
+                    desiredStateSeries.set(newKey, Integer.parseInt(desiredValue));
+
+                    }catch(NumberFormatException ex){
+                        ex.printStackTrace();
+                        error=new FacesMessage("A value you entered was not a number");
+                        FacesContext.getCurrentInstance().addMessage("Error Message:", error);
+                    }
+                }
+//            }
+            
+//            checkbox nicht angeclickt und serie zum einfügen manuell gewählt
+//            if(bothSeries==false){
+//                System.out.println("In nur eine Serie eintragen!");
+//                if(newValue!=null&&newKey!=null){
+//                    
+//                    switch(seriesindex){
+//                        case 0:
+//                            try{
+//                                System.out.println("In desired eintragen!");
+//                                actualStateSeries.set(newKey, 0);
+//                                desiredStateSeries.set(newKey, Integer.parseInt(newValue));
+//                            }catch(NumberFormatException ex){
+//                                ex.printStackTrace();
+//                                error=new FacesMessage("A value you entered was not a number");
+//                                FacesContext.getCurrentInstance().addMessage("Error Message:", error);
+//                            }
+//                            
+//                            //FEHLER! Methode die in eine Serie einträgt nutzt immer actualseries
+//                        case 1:
+//                            try{
+//                                System.out.println("In actual eintragen!");
+//                                actualStateSeries.set(newKey, Integer.parseInt(newValue));
+//                                desiredStateSeries.set(newKey, 0);
+//                            }catch(NumberFormatException ex){
+//                                ex.printStackTrace();
+//                                error=new FacesMessage("A value you entered was not a number");
+//                                FacesContext.getCurrentInstance().addMessage("Error Message:", error);
+//                            }
+//                    }
+//                }
+//            }
         }
+    }
+    
+    public void editMilestoneListener(int seriesindex, int itemindex){
+        Map<Object, Number> seriesData = null;  //Containing Keys and Values
+        Number oldValue = null;                
+        
+        switch(seriesindex){
+            case 0:
+                seriesData = desiredStateSeries.getData();
+                break;
+                
+            case 1:
+                seriesData = actualStateSeries.getData();
+                break;
+        }
+        
+        try{
+            ArrayList<Number> values = new ArrayList<>(seriesData.values());
+            oldValue = values.get(itemindex);
+            
+            Set<Object> keys = seriesData.keySet();
+            Iterator keyIterator = keys.iterator();
+            String key = null;
+            
+            int i = 0;  //Ein durchlauf zu viel!
+                        //MUSS DIALOG IN BEAN SICHTBAR MACHEN!
+            while(i <= itemindex){
+                key = keyIterator.next().toString();
+                i++;
+            }
+            
+            beforeEdit = new BurnDownElement(oldValue.intValue(), itemindex, seriesindex, key);
+            this.oldValue = oldValue.intValue();
+
+            afterEdit = new BurnDownElement();
+            afterEdit.setItemindex(itemindex);
+            afterEdit.setKey(key);
+            afterEdit.setSeriesindex(seriesindex);
+            
+            //Dialog sichtbar machen
+            RequestContext context = RequestContext.getCurrentInstance();
+            context.execute("PF('popupEdit').show();");       
+            context.update("popupDialogEdit");
+
+            
+        }catch(NullPointerException ex){            
+            ex.printStackTrace();
+        }
+    }
+    
+    public void editMilestone(){        
+        afterEdit.setValue(alteredValue);
+
+        switch(afterEdit.getSeriesindex()){
+            case 0:
+                desiredStateSeries.set(afterEdit.getKey(), afterEdit.getValue());
+                break;
+
+            case 1:
+                actualStateSeries.set(afterEdit.getKey(), afterEdit.getValue());
+                break;
+        }
+
+    }
+    
+    public void changeOrder(){
+        //we need the index of the two series you want to swap
     }
 }
